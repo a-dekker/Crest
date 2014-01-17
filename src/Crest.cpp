@@ -112,6 +112,7 @@ std::vector<proc> ps::get_ps() {
 QVariantList ps::get_ps_by(QString by, bool only_gui) {
     QVariantList ls;
     static char buff[16];
+    int point;
     QVariantMap mp;
     std::vector<proc> procs = get_ps();
 
@@ -125,7 +126,15 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
 
     for(auto i : procs) {
         mp.clear();
-        mp.insert("name", i.proc_name);
+        if(only_gui) {
+            if(((point = i.proc_name.indexOf("harbour-")) == -1) && ((point = i.proc_name.indexOf("jolla-")) == -1))
+                continue;
+            mp.insert("name", i.proc_name.mid(point));
+        } else {
+           if(i.proc_name[0] == '[')
+               continue;
+           mp.insert("name", i.proc_name);
+        }
         if(i.rss < 999)
            sprintf(buff,"%d kB", i.rss);
         else if (i.rss < 4092)

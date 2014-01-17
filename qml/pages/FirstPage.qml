@@ -9,15 +9,20 @@ Page {
     property var rss_size:  (page.width / 10) * 3
     property var name_size: (page.width / 10) * 5
     property var sort: "cpu"
+    property var gui_only: true
+    function refresh() {
+        list.model = ps.get_ps_by(page.sort, page.gui_only);
+    }
+
     PS {
         id: ps
     }
     Timer {
         id: timer
-        interval: 1000
+        interval: 3000
         running: true
         repeat: true
-        onTriggered: list.model = ps.get_ps_by(page.sort)
+        onTriggered: page.refresh()
     }
 
     SilicaFlickable {
@@ -26,15 +31,28 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: "Sort by: CPU"
-                onClicked: { page.sort = "cpu"; list.model = ps.get_ps_by(page.sort) }
+                onClicked: { page.sort = "cpu"; page.refresh() }
             }
             MenuItem {
                 text: "Sort by: RSS"
-                onClicked: { page.sort = "rss"; list.model = ps.get_ps_by(page.sort) }
+                onClicked: { page.sort = "rss"; page.refresh() }
             }
             MenuItem {
                 text: "Sort by: Name"
-                onClicked: { page.sort = "name"; list.model = ps.get_ps_by(page.sort) }
+                onClicked: { page.sort = "name"; page.refresh() }
+            }
+            MenuItem {
+                id: guiMenu
+                text: "Only GUI: On"
+                onClicked: { if(guiMenu.text == "Only GUI: On") {
+                                    guiMenu.text = "Only GUI: Off"
+                                    page.gui_only = false
+                                } else {
+                                    guiMenu.text = "Only GUI: On"
+                                    page.gui_only = true
+                                }
+                                page.refresh()
+                           }
             }
             MenuItem {
                 id: refreshMenu
@@ -52,7 +70,7 @@ Page {
         SilicaListView {
             anchors.fill: parent
             id: list
-            model: ps.get_ps_by(page.sort)
+            model: ps.get_ps_by(page.sort, page.gui_only)
             header: Row {
                 spacing: Theme.paddingMedium
                 Label {
