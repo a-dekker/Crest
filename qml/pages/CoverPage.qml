@@ -1,5 +1,6 @@
 /******************************************************************************
  *                                                                            *
+ * Crest - top like tool for SailfishOS                                       *
  * Copyright (C) 2014 by Michal Hrusecky <Michal@Hrusecky.net>                *
  *                                                                            *
  * This program is free software: you can redistribute it and/or modify       *
