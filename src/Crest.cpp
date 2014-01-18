@@ -2,6 +2,7 @@
 #include <sailfishapp.h>
 #include "crest.h"
 #include <QVariant>
+#include <QRegExp>
 #include <algorithm>
 #include <unistd.h>
 #include <sys/types.h>
@@ -24,7 +25,7 @@ std::vector<proc> ps::get_ps() {
        close(1);
        close(pp[0]);
        dup2(pp[1],1);
-       execlp("ps","ps", "axo", "%cpu,rss,args", NULL);
+       execlp("ps","ps", "axo", "pcpu,rss,args", NULL);
        return running;
     } else {
        close(pp[1]);
@@ -94,6 +95,7 @@ std::vector<proc> ps::get_ps() {
              buff[i] = 0;
              pr.proc_name = buff;
           }
+          // Rest
           if(i == 128)
              while( tmp != '\n' )
                 if(readc(pp[0], tmp) < 1) {
@@ -130,7 +132,7 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
         if(only_gui) {
             if(((point = i.proc_name.indexOf("harbour-")) != -1) || ((point = i.proc_name.indexOf("jolla-")) != -1))
                 mp.insert("name", i.proc_name.mid(point));
-            else if(i.proc_name.contains("^[a-z]+[.][a-zA-Z0-9.]*$"))
+            else if(i.proc_name.contains(QRegExp("^[a-z]+\\.[a-zA-Z0-9.]*\\s*$")))
                 mp.insert("name", i.proc_name);
             else
                 continue;
