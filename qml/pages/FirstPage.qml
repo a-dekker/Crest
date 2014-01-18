@@ -5,9 +5,9 @@ import PS 1.0
 Page {
     id: page
 
-    property var cpu_size:  (page.width / 10) * 2
-    property var rss_size:  (page.width / 10) * 3
-    property var name_size: (page.width / 10) * 5
+    property var cpu_size:  (page.width / 10) * 1.75
+    property var rss_size:  (page.width / 10) * 2.25
+    property var name_size: (page.width / 10) * 6
     property var sort: "cpu"
     property var gui_only: true
     function refresh() {
@@ -100,9 +100,9 @@ Page {
             }
             delegate: Row {
                 spacing: Theme.paddingMedium
-                Label { horizontalAlignment: Text.AlignRight; text: modelData["cpu"];  width: page.cpu_size }
-                Label { horizontalAlignment: Text.AlignRight; text: modelData["rss"]; width: page.rss_size }
-                Label { text: modelData["name"]; width: page.name_size }
+                Label { horizontalAlignment: Text.AlignRight; text: modelData["cpu"]; width: page.cpu_size; font.pixelSize: Theme.fontSizeSmall }
+                Label { horizontalAlignment: Text.AlignRight; text: modelData["rss"]; width: page.rss_size; font.pixelSize: Theme.fontSizeSmall }
+                Label { text: modelData["name"]; width: page.name_size; font.pixelSize: Theme.fontSizeSmall }
             }
         }
     }
