@@ -1,0 +1,34 @@
+Crest
+=====
+
+About application
+-----------------
+
+Simple top like application. Show applications/processes on your cell phone
+sorted either by CPU or memory usage. Cover page shows average load.
+
+*Important notice*:
+
+* Memory column shows RSS (Resident Set Size) which is not a real memory usage.
+  It includes shared resources, so the number is typically bigger.
+* Average load doesn't mean CPU utilization as it includes processes waiting
+  for io as well. See http://en.wikipedia.org/wiki/Load_(computing)[wikipedia].
+
+Current status of application is somewhere around alpha. It works and it's not
+gonna eat your kittens, but there might be (and probably are) bugs. Especially
+regarding filtering apps. If you have a good (specific and implementable) idea
+how to improve the application, let me know. Patches are also very welcome.
+Direct both to https://github.com/miska/Crest[github].
+
+Binaries
+--------
+
+Binaries are currently available and will be updated at
+https://openrepos.net/content/miska/crest[OpenRepos]
+
+About the origin
+----------------
+
+This application was written by http://michal.hrusecky.net[Michal Hrušecký] and
+is distributed under GPL-3.0 license with hope that somebody will find it
+useful.
