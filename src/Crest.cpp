@@ -127,9 +127,12 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
     for(auto i : procs) {
         mp.clear();
         if(only_gui) {
-            if(((point = i.proc_name.indexOf("harbour-")) == -1) && ((point = i.proc_name.indexOf("jolla-")) == -1))
+            if(((point = i.proc_name.indexOf("harbour-")) != -1) || ((point = i.proc_name.indexOf("jolla-")) != -1))
+                mp.insert("name", i.proc_name.mid(point));
+            else if(i.proc_name.contains("^[a-z]+[.][a-zA-Z0-9.]*$"))
+                mp.insert("name", i.proc_name);
+            else
                 continue;
-            mp.insert("name", i.proc_name.mid(point));
         } else {
            if(i.proc_name[0] == '[')
                continue;
@@ -137,7 +140,7 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
         }
         if(i.rss < 999)
            sprintf(buff,"%d kB", i.rss);
-        else if (i.rss < 4092)
+        else if (i.rss < 2048)
            sprintf(buff,"%d %3d kB", i.rss/1000, i.rss %1000);
         else {
            int tmp = (i.rss * 100) / 1024;
