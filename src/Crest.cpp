@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <ctype.h>
 
 #define readc(a,b) (read(a, &b, 1))
 
@@ -154,9 +155,23 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
     return ls;
 }
 
+QString ps::load_avg() {
+    char buff[24];
+    char *ptr = buff;
+    int cr;
+    FILE* fl = NULL;
+
+    fl = fopen("/proc/loadavg","r");
+    while(((cr = fgetc(fl)) != EOF) && ((isdigit(cr) || (cr=='.'))))
+        (*(ptr++))=cr;
+    (*ptr) = 0;
+    fclose(fl);
+    return buff;
+}
+
 int main(int argc, char *argv[])
 {
-    qmlRegisterType<ps>("PS", 1, 0, "PS");
+    qmlRegisterType<ps>("harbour.crest.ps", 1, 0, "PS");
 
     return SailfishApp::main(argc, argv);
 }

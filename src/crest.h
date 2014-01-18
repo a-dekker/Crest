@@ -19,6 +19,7 @@ public:
     explicit ps(QObject* parent = 0) : QObject(parent) {}
     ~ps() {}
     Q_INVOKABLE QVariantList get_ps_by(QString by, bool only_gui=false);
+    Q_INVOKABLE QString load_avg();
 };
 
 #endif // CREST_H

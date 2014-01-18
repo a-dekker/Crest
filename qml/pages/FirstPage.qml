@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import PS 1.0
 
 Page {
     id: page
@@ -14,9 +13,6 @@ Page {
         list.model = ps.get_ps_by(page.sort, page.gui_only);
     }
 
-    PS {
-        id: ps
-    }
     Timer {
         id: timer
         interval: 3000
@@ -79,7 +75,7 @@ Page {
                     font.bold: true
                     color: Theme.secondaryColor
                     width: page.cpu_size
-                    horizontalAlignment: Text.AlignHCenter;
+                    horizontalAlignment: Text.AlignHCenter
                 }
                 Label {
                     id: rss
@@ -87,7 +83,7 @@ Page {
                     font.bold: true
                     color: Theme.secondaryColor
                     width: page.rss_size
-                    horizontalAlignment: Text.AlignHCenter;
+                    horizontalAlignment: Text.AlignHCenter
                 }
                 Label {
                     id: name
@@ -95,7 +91,7 @@ Page {
                     font.bold: true
                     color: Theme.secondaryColor
                     width: page.name_size
-                    horizontalAlignment: Text.AlignHCenter;
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
             delegate: Row {

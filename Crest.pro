@@ -11,7 +11,8 @@ OTHER_FILES += \
     rpm/harbour-crest.yaml \
     rpm/harbour-crest.spec \
     harbour-crest.desktop \
-    qml/harbour-crest.qml
+    qml/harbour-crest.qml \
+    qml/pages/CoverPage.qml
 
 HEADERS += \
     src/crest.h
