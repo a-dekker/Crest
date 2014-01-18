@@ -39,12 +39,12 @@ Page {
             }
             MenuItem {
                 id: guiMenu
-                text: "Only GUI: On"
-                onClicked: { if(guiMenu.text == "Only GUI: On") {
-                                    guiMenu.text = "Only GUI: Off"
+                text: "Apps only: On"
+                onClicked: { if(guiMenu.text == "Apps only: On") {
+                                    guiMenu.text = "App only: Off"
                                     page.gui_only = false
                                 } else {
-                                    guiMenu.text = "Only GUI: On"
+                                    guiMenu.text = "Apps only: On"
                                     page.gui_only = true
                                 }
                                 page.refresh()
