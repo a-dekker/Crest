@@ -32,3 +32,7 @@ About the origin
 This application was written by http://michal.hrusecky.net[Michal Hrušecký] and
 is distributed under GPL-3.0 license with hope that somebody will find it
 useful.
+
+If you like the application, and feel generous, you can
+https://flattr.com/submit/auto?user_id=miska&url=https%3A%2F%2Fgithub.com%2Fmiska%2FCrest[flatter this]
+or send me some bitcoins to BTC: 1JRC4u3dex1ox45RJkijM2aJEMsbZ28wZH
