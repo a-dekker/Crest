@@ -13,7 +13,7 @@ Name:       harbour-crest
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Top like application
-Version:    0.1
+Version:    1.0
 Release:    1
 Group:      Qt/Qt
 License:    GPL-3.0
@@ -29,7 +29,7 @@ BuildRequires:  pkgconfig(sailfishapp) >= 0.0.10
 BuildRequires:  desktop-file-utils
 
 %description
-Simple application that displays processes and how are they using your CPU or memory,
+Simple top like application. Show applications/processes on your cell phone sorted either by CPU or memory usage. Let's you kill processes running under the same user. Use with care. Cover page shows average load.
 
 %prep
 %setup -q -n %{name}-%{version}

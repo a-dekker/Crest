@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <unistd.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <ctype.h>
 
@@ -45,7 +46,7 @@ std::vector<proc> ps::get_ps() {
        close(1);
        close(pp[0]);
        dup2(pp[1],1);
-       execlp("ps","ps", "axo", "pcpu,rss,args", NULL);
+       execlp("ps","ps", "axo", "pid,uid,pcpu,rss,args", NULL);
        return running;
     } else {
        close(pp[1]);
@@ -54,8 +55,48 @@ std::vector<proc> ps::get_ps() {
           tmp = 0;
        while( tmp != 0) {
           pr.cpu = 0;
+          pr.pid = 0;
+          pr.uid = 0;
           pr.rss = 0;
           pr.proc_name = "";
+          // Space
+          while( ! isdigit(tmp) )
+             if(readc(pp[0], tmp) < 1) {
+                tmp = 0;
+                goto save;
+             }
+          i = 0;
+          // PID
+          while( isdigit(tmp) || (tmp == '.') ) {
+             buff[i++] = tmp;
+             if(readc(pp[0], tmp) < 1) {
+                tmp = 0;
+                goto save;
+             }
+          }
+          if(i > 0) {
+             buff[i] = 0;
+             sscanf(buff, "%d", &pr.pid);
+          }
+          // Space
+          while( ! isdigit(tmp) )
+             if(readc(pp[0], tmp) < 1) {
+                tmp = 0;
+                goto save;
+             }
+          i = 0;
+          // UID
+          while( isdigit(tmp) || (tmp == '.') ) {
+             buff[i++] = tmp;
+             if(readc(pp[0], tmp) < 1) {
+                tmp = 0;
+                goto save;
+             }
+          }
+          if(i > 0) {
+             buff[i] = 0;
+             sscanf(buff, "%d", &pr.uid);
+          }
           // Space
           while( ! isdigit(tmp) )
              if(readc(pp[0], tmp) < 1) {
@@ -136,6 +177,7 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
     QVariantList ls;
     static char buff[16];
     int point;
+    int uid = getuid();
     QVariantMap mp;
     std::vector<proc> procs = get_ps();
 
@@ -150,12 +192,14 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
     for(auto i : procs) {
         mp.clear();
         if(only_gui) {
-            if(((point = i.proc_name.indexOf("harbour-")) != -1) || ((point = i.proc_name.indexOf("jolla-")) != -1))
+            if(((point = i.proc_name.indexOf("harbour-")) != -1) || ((point = i.proc_name.indexOf("jolla-")) != -1)) {
                 mp.insert("name", i.proc_name.mid(point));
-            else if(i.proc_name.contains(QRegExp("^[a-z]+\\.[a-zA-Z0-9.]*\\s*$")))
+            } else {
+            if(i.proc_name.contains(QRegExp("^[a-z]+\\.[a-zA-Z0-9.]*\\s*$")))
                 mp.insert("name", i.proc_name);
             else
                 continue;
+            }
         } else {
            if(i.proc_name[0] == '[')
                continue;
@@ -169,12 +213,23 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
            int tmp = (i.rss * 100) / 1024;
            sprintf(buff,"%d.%2d MB", tmp/100, tmp % 100);
         }
+        mp.insert("pid", i.pid);
+        mp.insert("killable", i.uid == uid);
         mp.insert("rss", QString(buff));
         sprintf(buff,"%d.%d %%", i.cpu/10, i.cpu%10);
         mp.insert("cpu", QString(buff));
         ls.append(mp);
     }
     return ls;
+}
+
+int ps::kill(int pid, int signal) {
+    char buff[64];
+    if((pid > 0) && (pid!=getpid())) {
+        sprintf(buff,"kill -%d %d", signal, pid);
+        printf("kill -%d %d\n$? = %d", signal, pid, system(buff));
+    }
+    return 0;
 }
 
 QString ps::load_avg() {

@@ -27,6 +27,8 @@
 #include <vector>
 
 struct proc {
+    int pid;
+    int uid;
     int cpu;
     int rss;
     QString proc_name;
@@ -40,6 +42,7 @@ public:
     ~ps() {}
     Q_INVOKABLE QVariantList get_ps_by(QString by, bool only_gui=false);
     Q_INVOKABLE QString load_avg();
+    Q_INVOKABLE int kill(int pid, int signal);
 };
 
 #endif // CREST_H
