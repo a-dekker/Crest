@@ -4,21 +4,24 @@ Crest
 About application
 -----------------
 
-Simple top like application. Show applications/processes on your cell phone
-sorted either by CPU or memory usage. Cover page shows average load.
+Top like application. Show applications/processes on your cell phone sorted
+either by CPU or memory usage. You can also terminate/kill selected process.
+Cover page shows average load.
 
 *Important notice*:
 
+* Do not kill stuff unless you know what you are doing, can lead into lot of
+  troubles.
 * Memory column shows RSS (Resident Set Size) which is not a real memory usage.
   It includes shared resources, so the number is typically bigger.
 * Average load doesn't mean CPU utilization as it includes processes waiting
   for io as well. See http://en.wikipedia.org/wiki/Load_(computing)[wikipedia].
 
-Current status of application is somewhere around alpha. It works and it's not
-gonna eat your kittens, but there might be (and probably are) bugs. Especially
-regarding filtering apps. If you have a good (specific and implementable) idea
-how to improve the application, let me know. Patches are also very welcome.
-Direct both to https://github.com/miska/Crest[github].
+Current status of application is somewhere around beta. It works and it's not
+gonna eat your kittens (if you are careful), but there might be (and probably
+are) bugs. Especially regarding filtering apps. If you have a good (specific
+and implementable) idea how to improve the application, let me know. Patches
+are also very welcome. Direct both to https://github.com/miska/Crest[github].
 
 Binaries
 --------
