@@ -25,6 +25,7 @@ import harbour.crest.ps 1.0
 
 ApplicationWindow
 {
+    id: app
     PS {
         id: ps
     }

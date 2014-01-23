@@ -31,6 +31,7 @@ Page {
     property var gui_only: true
     property var refreshing: true
     property var paused: false
+    property var applicationActive: app.applicationActive
     function refresh() {
         list.model = ps.get_ps_by(page.sort, page.gui_only);
         timer.interval = 3000
@@ -46,6 +47,13 @@ Page {
         if(paused) {
             paused = false;
             refreshing = true;
+        }
+    }
+    onApplicationActiveChanged: {
+        if(applicationActive) {
+            refresh();
+        } else {
+            pause();
         }
     }
 
