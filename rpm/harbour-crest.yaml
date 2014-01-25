@@ -3,7 +3,7 @@ Summary: Top like application
 Version: 1.1
 Release: 1
 Group: Qt/Qt
-URL: http://example.org/
+URL: https://github.com/miska/Crest
 License: GPL-3.0
 Sources:
 - '%{name}-%{version}.tar.bz2'
@@ -17,7 +17,8 @@ PkgConfigBR:
 - Qt5Core
 - sailfishapp >= 0.0.10
 Requires:
-- procps
+- /usr/bin/kill
+- /usr/bin/ps
 - sailfishsilica-qt5 >= 0.10.9
 Files:
 - '%{_bindir}'
