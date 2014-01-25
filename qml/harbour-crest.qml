@@ -29,6 +29,7 @@ ApplicationWindow
     PS {
         id: ps
     }
+    property var is_ok: ps.sys_check()
     cover: Component { CoverPage { } }
     initialPage: Qt.resolvedUrl(ps.sys_check() ? "pages/FirstPage.qml" : "pages/ErrorPage.qml")
 }

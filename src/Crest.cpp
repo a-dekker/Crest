@@ -43,6 +43,8 @@ std::vector<proc> ps::get_ps() {
 
     if(pipe(pp) == -1)
         return running;
+    if(!sys_check())
+        return running;
     if((ch_pid = fork()) == 0) {
        close(1);
        close(pp[0]);
@@ -175,7 +177,7 @@ std::vector<proc> ps::get_ps() {
 }
 
 bool ps::sys_check() {
-    if(system("test -x `which ps`") != 0) {
+    if(system("test -x \"`which ps`\"") != 0) {
         return false;
     }
     return true;
@@ -257,7 +259,6 @@ QString ps::load_avg() {
 int main(int argc, char *argv[])
 {
     qmlRegisterType<ps>("harbour.crest.ps", 1, 0, "PS");
-
     return SailfishApp::main(argc, argv);
 }
 
