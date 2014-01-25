@@ -20,8 +20,7 @@ License:    GPL-3.0
 URL:        https://github.com/miska/Crest
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-crest.yaml
-Requires:   /usr/bin/kill
-Requires:   /usr/bin/ps
+Requires:   procps
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Qml)

@@ -17,8 +17,7 @@ PkgConfigBR:
 - Qt5Core
 - sailfishapp >= 0.0.10
 Requires:
-- /usr/bin/kill
-- /usr/bin/ps
+- procps
 - sailfishsilica-qt5 >= 0.10.9
 Files:
 - '%{_bindir}'

@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <ctype.h>
 
 #define readc(a,b) (read(a, &b, 1))
@@ -171,6 +172,13 @@ std::vector<proc> ps::get_ps() {
        close(pp[0]);
        return running;
     }
+}
+
+bool ps::sys_check() {
+    if(system("test -x `which ps`") != 0) {
+        return false;
+    }
+    return true;
 }
 
 QVariantList ps::get_ps_by(QString by, bool only_gui) {

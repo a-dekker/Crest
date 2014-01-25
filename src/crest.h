@@ -42,6 +42,7 @@ public:
     ~ps() {}
     Q_INVOKABLE QVariantList get_ps_by(QString by, bool only_gui=false);
     Q_INVOKABLE QString load_avg();
+    Q_INVOKABLE bool sys_check();
     Q_INVOKABLE int kill(int pid, int signal);
 };
 

@@ -30,7 +30,7 @@ ApplicationWindow
         id: ps
     }
     cover: Component { CoverPage { } }
-    initialPage: Component { FirstPage { } }
+    initialPage: Qt.resolvedUrl(ps.sys_check() ? "pages/FirstPage.qml" : "pages/ErrorPage.qml")
 }
 
 
