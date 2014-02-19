@@ -13,15 +13,15 @@ Name:       harbour-crest
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Top like application
-Version:    1.1
+Version:    1.2.0
 Release:    1
 Group:      Qt/Qt
 License:    GPL-3.0
 URL:        https://github.com/miska/Crest
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-crest.yaml
-Requires:   procps
 Requires:   sailfishsilica-qt5 >= 0.10.9
+Requires:   procps
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Core)
