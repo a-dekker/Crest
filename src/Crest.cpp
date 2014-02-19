@@ -184,8 +184,9 @@ bool ps::sys_check() {
 }
 
 QVariantList ps::get_ps_by(QString by, bool only_gui) {
-    QVariantList ls;
+    std::vector<QVariantMap> ls;
     static char buff[16];
+    QVariantList ret;
     int point;
     int uid = getuid();
     QVariantMap mp;
@@ -195,14 +196,12 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
         std::sort(procs.begin(), procs.end(), [](proc a, proc b) { return a.cpu > b.cpu; });
     } else if(by=="rss") {
         std::sort(procs.begin(), procs.end(), [](proc a, proc b) { return a.rss > b.rss; });
-    } else if(by=="name") {
-        std::sort(procs.begin(), procs.end(), [](proc a, proc b) { return a.proc_name < b.proc_name; });
     }
 
     for(auto i : procs) {
         mp.clear();
         if(only_gui) {
-            if(((point = i.proc_name.indexOf("harbour-")) != -1) || ((point = i.proc_name.indexOf("jolla-")) != -1)) {
+            if((((point = i.proc_name.indexOf("harbour-")) != -1) || ((point = i.proc_name.indexOf("jolla-")) != -1)) && (i.proc_name.indexOf("invoker")==-1)) {
                 mp.insert("name", i.proc_name.mid(point));
             } else {
             if(i.proc_name.contains(QRegExp("^[a-z]+\\.[a-zA-Z0-9.]*\\s*$")))
@@ -228,9 +227,15 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
         mp.insert("rss", QString(buff));
         sprintf(buff,"%d.%d %%", i.cpu/10, i.cpu%10);
         mp.insert("cpu", QString(buff));
-        ls.append(mp);
+        ls.push_back(mp);
     }
-    return ls;
+    if(by=="name") {
+        std::sort(ls.begin(), ls.end(), [](QVariantMap a, QVariantMap b) { return (a.find("name")->toString() < b.find("name")->toString()); });
+    }
+    for(auto i: ls)
+        ret.append(i);
+
+    return ret;
 }
 
 int ps::kill(int pid, int signal) {
