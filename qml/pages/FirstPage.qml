@@ -24,9 +24,11 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
-    property var cpu_size:  (page.width / 10) * 1.75
-    property var rss_size:  (page.width / 10) * 2.25
-    property var name_size: (page.width / 10) * 6
+    allowedOrientations: Orientation.All
+
+    property var cpu_size:  Theme.fontSizeSmall * 3.4
+    property var rss_size:  Theme.fontSizeSmall * 4.4
+    property var name_size: page.width - cpu_size - rss_size
     property var sort: "cpu"
     property var gui_only: true
     property var refreshing: true
