@@ -29,7 +29,8 @@ CoverBackground {
         running: true;
         repeat: true
         onTriggered: {
-            loadAvg.text = ps.load_avg()
+            loadAvg.text = ps.load_avg();
+            uptime.text = ps.uptime();
         }
     }
     Column {
@@ -43,6 +44,19 @@ CoverBackground {
         }
         Label {
             id: loadAvg
+            width: loadLabel.width
+            horizontalAlignment: Text.AlignHCenter
+            text: ""
+            font.pixelSize: Theme.fontSizeExtraLarge
+        }
+        Label {
+            id: uptimeLabel
+            text: qsTr("Uptime:")
+            color: Theme.secondaryColor
+            font.pixelSize: Theme.fontSizeLarge
+        }
+        Label {
+            id: uptime
             width: loadLabel.width
             horizontalAlignment: Text.AlignHCenter
             text: ""

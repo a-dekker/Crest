@@ -73,15 +73,21 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: "Sort by: CPU"
-                onClicked: { page.sort = "cpu"; page.refresh() }
+                onClicked: {
+                    page.sort = (page.sort == "cpu")?"-cpu":"cpu";
+                    page.refresh(); }
             }
             MenuItem {
                 text: "Sort by: RSS"
-                onClicked: { page.sort = "rss"; page.refresh() }
+                onClicked: {
+                    page.sort = (page.sort == "rss")?"-rss":"rss";
+                    page.refresh(); }
             }
             MenuItem {
                 text: "Sort by: Name"
-                onClicked: { page.sort = "name"; page.refresh() }
+                onClicked: {
+                    page.sort = (page.sort == "name")?"-name":"name";
+                    page.refresh(); }
             }
             MenuItem {
                 id: guiMenu
@@ -109,34 +115,35 @@ Page {
             }
         }
         SilicaListView {
-            anchors.fill: parent
+            x: Theme.paddingSmall
+            y: Theme.paddingMedium
+            width: parent.width - 2*x
+            height: parent.height - y
             id: list
             property Item contextMenu;
             model: ps.get_ps_by(page.sort, page.gui_only)
             onMovementStarted: page.pause()
             onMovementEnded: page.unpause()
             header: Row {
+                id: header
                 spacing: Theme.paddingMedium
                 Label {
-                    id: cpu
-                    text: "CPU"
-                    font.bold: true
+                    id: cpuLabel
+                    text: (sort == "cpu") ? "▼ CPU" : ((sort == "-cpu") ? "▲ CPU" : "CPU")
                     color: Theme.secondaryColor
                     width: page.cpu_size
                     horizontalAlignment: Text.AlignHCenter
                 }
                 Label {
                     id: rss
-                    text: "RSS"
-                    font.bold: true
+                    text: (sort == "rss") ? "▼ RSS" : ((sort == "-rss") ? "▲ RSS" : "RSS")
                     color: Theme.secondaryColor
                     width: page.rss_size
                     horizontalAlignment: Text.AlignHCenter
                 }
                 Label {
                     id: name
-                    text: "Process"
-                    font.bold: true
+                    text: (sort == "-name") ? "▼ Process" : ((sort == "name") ? "▲ Process" : "Process")
                     color: Theme.secondaryColor
                     width: page.name_size
                     horizontalAlignment: Text.AlignHCenter

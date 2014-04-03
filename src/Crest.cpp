@@ -190,12 +190,24 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
     int point;
     int uid = getuid();
     QVariantMap mp;
+    bool reverse = false;
     std::vector<proc> procs = get_ps();
 
+    if(by[0] == '-') {
+        reverse = true;
+        by = by.mid(1);
+    }
+
     if(by=="cpu") {
-        std::sort(procs.begin(), procs.end(), [](proc a, proc b) { return a.cpu > b.cpu; });
+        std::sort(procs.begin(), procs.end(), reverse ?
+                      [](proc a, proc b) { return a.cpu < b.cpu; } :
+                      [](proc a, proc b) { return a.cpu > b.cpu; }
+        );
     } else if(by=="rss") {
-        std::sort(procs.begin(), procs.end(), [](proc a, proc b) { return a.rss > b.rss; });
+        std::sort(procs.begin(), procs.end(), reverse ?
+                      [](proc a, proc b) { return a.rss < b.rss; } :
+                      [](proc a, proc b) { return a.rss > b.rss; }
+        );
     }
 
     for(auto i : procs) {
@@ -227,13 +239,20 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
         mp.insert("rss", QString(buff));
         sprintf(buff,"%d.%d %%", i.cpu/10, i.cpu%10);
         mp.insert("cpu", QString(buff));
-        ls.push_back(mp);
+        if(by=="name") {
+            ls.push_back(mp);
+        } else {
+            ret.append(mp);
+        }
     }
     if(by=="name") {
-        std::sort(ls.begin(), ls.end(), [](QVariantMap a, QVariantMap b) { return (a.find("name")->toString() < b.find("name")->toString()); });
+        std::sort(ls.begin(), ls.end(), reverse ?
+                      [](QVariantMap a, QVariantMap b) { return (a.find("name")->toString() > b.find("name")->toString()); } :
+                      [](QVariantMap a, QVariantMap b) { return (a.find("name")->toString() < b.find("name")->toString()); }
+        );
+        for(auto i: ls)
+            ret.append(i);
     }
-    for(auto i: ls)
-        ret.append(i);
 
     return ret;
 }
@@ -258,6 +277,23 @@ QString ps::load_avg() {
         (*(ptr++))=cr;
     (*ptr) = 0;
     fclose(fl);
+    return buff;
+}
+
+QString ps::uptime() {
+    char buff[24];
+    int uptime;
+    FILE* fl = NULL;
+
+    fl = fopen("/proc/uptime","r");
+    if(fscanf(fl,"%d",&uptime) != 1)
+        uptime = -1;
+    fclose(fl);
+    if(uptime < 2*24*3600) {
+        snprintf(buff, 24, "%02d:%02d", uptime/3600, abs(uptime/60)%60);
+    } else {
+        snprintf(buff, 24, "%d days", uptime / (3600 * 24));
+    }
     return buff;
 }
 
