@@ -1,3 +1,5 @@
+
+
 /******************************************************************************
  *                                                                            *
  * Crest - top like tool for SailfishOS                                       *
@@ -17,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.      *
  *                                                                            *
  ******************************************************************************/
-
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
@@ -25,11 +26,12 @@ CoverBackground {
     id: coverPage
     Timer {
         id: pageTimer
-        interval: 1000;
-        running: true;
+        interval: 1000
+        running: true
         repeat: true
         onTriggered: {
             loadAvg.text = ps.load_avg()
+            uptime.text = ps.uptime() // not in github code
         }
     }
     Column {
@@ -37,7 +39,9 @@ CoverBackground {
         spacing: Theme.paddingLarge
         Label {
             id: loadLabel
-            text: qsTr("Load avg:")
+            text: qsTr("Load avg")
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.Center
             color: Theme.secondaryColor
             font.pixelSize: Theme.fontSizeLarge
         }
@@ -47,6 +51,21 @@ CoverBackground {
             horizontalAlignment: Text.AlignHCenter
             text: ""
             font.pixelSize: Theme.fontSizeExtraLarge
+        }
+        Label {
+            id: uptimeLabel
+            text: qsTr("Uptime")
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.Center
+            color: Theme.secondaryColor
+            font.pixelSize: Theme.fontSizeLarge
+        }
+        Label {
+            id: uptime
+            width: loadLabel.width
+            horizontalAlignment: Text.AlignHCenter
+            text: ""
+            font.pixelSize: Theme.fontSizeSmall
         }
     }
 }

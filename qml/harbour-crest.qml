@@ -1,3 +1,5 @@
+
+
 /******************************************************************************
  *                                                                            *
  * Crest - top like tool for SailfishOS                                       *
@@ -17,21 +19,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.      *
  *                                                                            *
  ******************************************************************************/
-
-import QtQuick 2.0
+import QtQuick 2.2
 import Sailfish.Silica 1.0
 import "pages"
 import harbour.crest.ps 1.0
 
-ApplicationWindow
-{
+ApplicationWindow {
     id: app
+
     PS {
         id: ps
     }
+
     property var is_ok: ps.sys_check()
-    cover: Component { CoverPage { } }
-    initialPage: Qt.resolvedUrl(ps.sys_check() ? "pages/FirstPage.qml" : "pages/ErrorPage.qml")
+
+    allowedOrientations: Orientation.Portrait | Orientation.Landscape
+                         | Orientation.LandscapeInverted
+    _defaultPageOrientations: Orientation.Portrait | Orientation.Landscape
+                              | Orientation.LandscapeInverted
+    cover: Component {
+        CoverPage {
+        }
+    }
+
+    initialPage: Qt.resolvedUrl(
+                     ps.sys_check(
+                         ) ? "pages/FirstPage.qml" : "pages/ErrorPage.qml")
 }
-
-

@@ -32,6 +32,7 @@ struct proc {
     int cpu;
     int rss;
     QString proc_name;
+    QString proc_name_nopath;
 };
 
 class ps : public QObject {
@@ -42,8 +43,10 @@ public:
     ~ps() {}
     Q_INVOKABLE QVariantList get_ps_by(QString by, bool only_gui=false);
     Q_INVOKABLE QString load_avg();
+    Q_INVOKABLE QString uptime();
     Q_INVOKABLE bool sys_check();
-    Q_INVOKABLE int kill(int pid, int signal);
+    Q_INVOKABLE bool hasSudo();
+    Q_INVOKABLE int kill(int pid, int signal, int userid);
 };
 
-#endif // CREST_H
+#endif  // SRC_CREST_H_
