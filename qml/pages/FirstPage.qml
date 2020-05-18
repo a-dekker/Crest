@@ -34,13 +34,19 @@ Page {
     property var refreshing: true
     property var paused: false
     property var applicationActive: app.applicationActive && app.is_ok
+    property bool pageactive: false
 
     property string name
     property string name_nopath
     property string cpu
     property int proc_owner
     property string pid
+    property string ppid
+    property string gid
     property string rss
+    property string cputime
+    property string start_time
+    property string mem_perc
     property var hasSudo: ps.hasSudo()
 
     function refresh() {
@@ -72,7 +78,12 @@ Page {
                                      "name": data[i]["name"],
                                      "name_nopath": data[i]["name_nopath"],
                                      "pid": data[i]["pid"],
-                                     "rss": data[i]["rss"]
+                                     "gid": data[i]["gid"],
+                                     "ppid": data[i]["ppid"],
+                                     "rss": data[i]["rss"],
+                                     "cputime": data[i]["cputime"],
+                                     "start_time": data[i]["start_time"],
+                                     "mem_perc": data[i]["mem_perc"]
                                  })
         }
     }
@@ -88,10 +99,17 @@ Page {
         }
     }
 
+    onStatusChanged: {
+        if ((status === PageStatus.Activating)
+                || (status === PageStatus.Active)) {
+            pageactive = true
+        }
+    }
+
     Timer {
         id: timer
         interval: 3000
-        running: page.refreshing
+        running: page.refreshing && page.pageactive
         repeat: true
         onTriggered: page.refresh()
     }
@@ -168,21 +186,27 @@ Page {
                 Row {
                     Label {
                         id: cpuLabel
-                        text: sort == "cpu" ? qsTr("▼ CPU") : sort == "-cpu" ? qsTr("▲ CPU") : qsTr("CPU")
+                        text: sort == "cpu" ? qsTr("▼ CPU") : sort
+                                              == "-cpu" ? qsTr("▲ CPU") : qsTr(
+                                                              "CPU")
                         color: Theme.secondaryColor
                         font.bold: true
                         width: page.cpu_size
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Label {
-                        text: sort == "rss" ? qsTr("▼ RSS") : sort == "-rss" ? qsTr("▲ RSS") : qsTr("RSS")
+                        text: sort == "rss" ? qsTr("▼ RSS") : sort
+                                              == "-rss" ? qsTr("▲ RSS") : qsTr(
+                                                              "RSS")
                         color: Theme.secondaryColor
                         font.bold: true
                         width: page.rss_size
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Label {
-                        text: sort == "name" ? qsTr("▼ Process") : sort == "-name" ? qsTr("▲ Process") : qsTr("Process")
+                        text: sort == "name" ? qsTr("▼ Process") : sort
+                                               == "-name" ? qsTr("▲ Process") : qsTr(
+                                                                "Process")
                         color: Theme.secondaryColor
                         font.bold: true
                         width: page.name_size
@@ -240,11 +264,11 @@ Page {
                     roleName: isPortrait ? "name_nopath" : "name"
                 }
             }
+
             delegate: ListItem {
                 menu: hasSudo || proc_owner === 100000 ? contextMenu : null
                 onClicked: {
-                    page.pause()
-                    page.unpause()
+                    showProcDetails()
                 }
                 contentHeight: Theme.fontSizeSmall * 1.5
                 Row {
@@ -276,6 +300,31 @@ Page {
                         color: proc_owner === 100000 ? Theme.secondaryColor : (proc_owner === 0 ? Theme.primaryColor : Theme.secondaryHighlightColor)
                     }
                 }
+
+                function showProcDetails() {
+                    pageactive = false
+                    pageStack.push(Qt.resolvedUrl("ProcInfo.qml"), {
+                                       "cpu": cpu,
+                                       "proc_owner": proc_owner,
+                                       "name": name,
+                                       "pid": pid,
+                                       "ppid": ppid,
+                                       "gid": gid,
+                                       "start_time": start_time,
+                                       "rss": rss,
+                                       "cputime": cputime,
+                                       "mem_perc": mem_perc
+                                   })
+                }
+
+                function killRemorse(kill_signal) {
+                    remorseAction(qsTr(""), function () {
+                                killRemorse(pid)
+                                ps.kill(pid, kill_signal, proc_owner)
+                                page.refresh()
+                    }, 3000)
+                }
+
                 Component {
                     id: contextMenu
                     ContextMenu {
@@ -283,20 +332,20 @@ Page {
                         Component.onDestruction: page.unpause()
                         MenuItem {
                             text: qsTr("Terminate pid ") + pid
-                            // font.pixelSize: Theme.fontSizeMedium
-                            // height: Theme.fontSizeSmall * 2
                             onClicked: {
-                                ps.kill(pid, 15, proc_owner)
-                                page.refresh()
+                                killRemorse(15)
                             }
                         }
                         MenuItem {
                             text: qsTr("Force Kill pid ") + pid
-                            // height: Theme.fontSizeSmall * 2
-                            // font.pixelSize: Theme.fontSizeSmall
                             onClicked: {
-                                ps.kill(pid, 9, proc_owner)
-                                page.refresh()
+                                killRemorse(9)
+                            }
+                        }
+                        MenuItem {
+                            text: qsTr("Process info")
+                            onClicked: {
+                                showProcDetails()
                             }
                         }
                     }

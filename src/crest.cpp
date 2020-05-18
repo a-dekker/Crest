@@ -54,7 +54,7 @@ std::vector<proc> ps::get_ps() {
         close(1);
         close(pp[0]);
         dup2(pp[1], 1);
-        execlp("ps", "ps", "axo", "pid,uid,pcpu,rss,args", NULL);
+        execlp("ps", "ps", "axo", "pid,uid,pcpu,rss,time,%mem,ppid,gid,start_time,args", NULL);
         return running;
     } else {
         close(pp[1]);
@@ -63,9 +63,14 @@ std::vector<proc> ps::get_ps() {
         while (tmp != 0) {
             pr.cpu = 0;
             pr.pid = 0;
+            pr.ppid = 0;
             pr.uid = 0;
+            pr.gid = 0;
             pr.rss = 0;
+            pr.cputime = "00:00:00";
+            pr.start_time = "";
             pr.proc_name = "";
+            pr.mem_perc = "0.0";
             // Space
             while (!isdigit(tmp))
                 if (readc(pp[0], tmp) < 1) {
@@ -74,7 +79,7 @@ std::vector<proc> ps::get_ps() {
                 }
             i = 0;
             // PID
-            while (isdigit(tmp) || (tmp == '.')) {
+            while (isdigit(tmp)) {
                 buff[i++] = tmp;
                 if (readc(pp[0], tmp) < 1) {
                     tmp = 0;
@@ -143,6 +148,101 @@ std::vector<proc> ps::get_ps() {
             if (i > 0) {
                 buff[i] = 0;
                 sscanf(buff, "%d", &(pr.rss));
+            }
+            // Space
+            while (isspace(tmp))
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            // CPU Time
+            i = 0;
+            while (tmp != 0 && i < 9) {
+                buff[i++] = tmp;
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            }
+            if (i > 0) {
+                buff[i] = 0;
+                pr.cputime = buff;
+            }
+            // Space
+            while (isspace(tmp))
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            // Percentage mem
+            i = 0;
+            while (isdigit(tmp) || (tmp == '.')) {
+                buff[i++] = tmp;
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            }
+            if (i > 0) {
+                buff[i] = 0;
+                pr.mem_perc = buff;
+            }
+            // Space
+            while (isspace(tmp))
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            // PPID
+            i = 0;
+            while (isdigit(tmp)) {
+                buff[i++] = tmp;
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            }
+            if (i > 0) {
+                buff[i] = 0;
+                sscanf(buff, "%d", &pr.ppid);
+            }
+            // Space
+            while (isspace(tmp))
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            // GID
+            i = 0;
+            while (isdigit(tmp)) {
+                buff[i++] = tmp;
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            }
+            if (i > 0) {
+                buff[i] = 0;
+                sscanf(buff, "%d", &pr.gid);
+            }
+            // Space
+            while (isspace(tmp))
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            // Start time
+            i = 0;
+            while (!isspace(tmp)) {
+                buff[i++] = tmp;
+                if (readc(pp[0], tmp) < 1) {
+                    tmp = 0;
+                    goto save;
+                }
+            }
+            if (i > 0) {
+                buff[i] = 0;
+                pr.start_time = buff;
             }
             // Space
             while (isspace(tmp))
@@ -251,10 +351,15 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
             snprintf(buff, sizeof(buff), "%d.%2d MB", tmp / 100, tmp % 100);
         }
         mp.insert("pid", i.pid);
+        mp.insert("ppid", i.ppid);
         mp.insert("proc_owner", i.uid);
+        mp.insert("gid", i.gid);
         mp.insert("rss", QString(buff));
         snprintf(buff, sizeof(buff), "%d.%d %%", i.cpu / 10, i.cpu % 10);
         mp.insert("cpu", QString(buff));
+        mp.insert("cputime", i.cputime);
+        mp.insert("start_time", i.start_time);
+        mp.insert("mem_perc", i.mem_perc);
         ls.append(mp);
     }
     return ls;

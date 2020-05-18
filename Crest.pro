@@ -1,6 +1,7 @@
 TARGET = harbour-crest
 
 CONFIG += sailfishapp
+CONFIG += c++11
 
 SOURCES += src/crest.cpp
 

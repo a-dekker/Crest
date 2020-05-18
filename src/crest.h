@@ -28,11 +28,16 @@
 
 struct proc {
     int pid;
+    int ppid;
     int uid;
+    int gid;
     int cpu;
     int rss;
+    QString cputime;
     QString proc_name;
+    QString start_time;
     QString proc_name_nopath;
+    QString mem_perc;
 };
 
 class ps : public QObject {
