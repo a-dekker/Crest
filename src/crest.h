@@ -46,7 +46,7 @@ class ps : public QObject {
 public:
     explicit ps(QObject* parent = 0) : QObject(parent) {}
     ~ps() {}
-    Q_INVOKABLE QVariantList get_ps_by(QString by, bool only_gui=false);
+    Q_INVOKABLE QVariantList get_ps_by(QString by, QString only_gui);
     Q_INVOKABLE QString load_avg();
     Q_INVOKABLE QString uptime();
     Q_INVOKABLE bool sys_check();

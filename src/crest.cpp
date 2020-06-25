@@ -54,7 +54,8 @@ std::vector<proc> ps::get_ps() {
         close(1);
         close(pp[0]);
         dup2(pp[1], 1);
-        execlp("ps", "ps", "axo", "pid,uid,pcpu,rss,time,%mem,ppid,gid,start_time,args", NULL);
+        execlp("ps", "ps", "axo",
+               "pid,uid,pcpu,rss,time,%mem,ppid,gid,start_time,args", NULL);
         return running;
     } else {
         close(pp[1]);
@@ -309,7 +310,7 @@ bool ps::sys_check() {
     return true;
 }
 
-QVariantList ps::get_ps_by(QString by, bool only_gui) {
+QVariantList ps::get_ps_by(QString by, QString list_type) {
     QVariantList ls;
     static char buff[16];
     QVariantMap mp;
@@ -326,9 +327,11 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
                   [](proc a, proc b) { return a.proc_name < b.proc_name; });
     }
 
+    int loopcount = 0;
     for (auto i : procs) {
+        loopcount++;
         mp.clear();
-        if (only_gui) {
+        if (list_type == "gui_only") {
             if (installedApps.contains(
                     getFileName(i.proc_name).split(" ").at(0))) {
                 mp.insert("name", i.proc_name);
@@ -336,10 +339,17 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
             } else {
                 continue;
             }
-        } else {
+        } else if (list_type == "all_procs") {
             if (i.proc_name[0] == '[') continue;
             mp.insert("name", i.proc_name);
             mp.insert("name_nopath", getFileName(i.proc_name));
+        } else {
+            mp.insert("name", i.proc_name);
+            if (i.proc_name[0] == '[') {
+                mp.insert("name_nopath", i.proc_name);
+            } else {
+                mp.insert("name_nopath", getFileName(i.proc_name));
+            }
         }
         if (i.rss < 999) {
             snprintf(buff, sizeof(buff), "%d kB", i.rss);
@@ -361,6 +371,9 @@ QVariantList ps::get_ps_by(QString by, bool only_gui) {
         mp.insert("start_time", i.start_time);
         mp.insert("mem_perc", i.mem_perc);
         ls.append(mp);
+        if (loopcount == 60 && list_type == "incl_nocmd") {
+            break;
+        }
     }
     return ls;
 }

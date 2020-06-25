@@ -30,7 +30,7 @@ Page {
     property var rss_size: Theme.fontSizeSmall * 4.4
     property var name_size: page.width - cpu_size - rss_size
     property var sort: "cpu"
-    property var gui_only: true
+    property var list_type: "gui_only"
     property var refreshing: true
     property var paused: false
     property var applicationActive: app.applicationActive && app.is_ok
@@ -70,7 +70,7 @@ Page {
 
     function addProc() {
         var data
-        data = ps.get_ps_by(page.sort, page.gui_only)
+        data = ps.get_ps_by(page.sort, page.list_type)
         for (var i = 0; i < data.length; i++) {
             listUnitModel.append({
                                      "cpu": data[i]["cpu"],
@@ -135,11 +135,15 @@ Page {
                 id: guiMenu
                 text: qsTr("Show all processes")
                 onClicked: {
-                    page.gui_only = !page.gui_only
-                    if (!page.gui_only) {
+                    if (page.list_type === "gui_only") {
+                        page.list_type = "all_procs"
+                        guiMenu.text = "Incl. no cmdline [top 60]"
+                    } else if (page.list_type === "all_procs") {
+                        page.list_type = "incl_nocmd"
                         guiMenu.text = qsTr("Show only apps")
-                    } else {
+                    } else if (page.list_type === "incl_nocmd") {
                         guiMenu.text = qsTr("Show all processes")
+                        page.list_type = "gui_only"
                     }
                     page.refresh()
                 }
