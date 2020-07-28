@@ -8,7 +8,7 @@ Name:       harbour-crest
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Top like application
-Version:    1.6
+Version:    1.7
 Release:    1
 Group:      Qt/Qt
 License:    GPL-3.0

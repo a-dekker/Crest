@@ -430,10 +430,20 @@ QString ps::uptime() {
     uptime = strtol(uptime_chr, NULL, 10);
     char *buf;
     size_t sz;
-    sz = snprintf(NULL, 0, "%ld secs, %ld hours\n", uptime, uptime / 3600);
+    int n = uptime;
+    int days = n / (24 * 3600);
+    n = n % (24 * 3600);
+    int hours = n / 3600;
+    n %= 3600;
+    int minutes = n / 60;
+    n %= 60;
+    int seconds = n;
+    sz = snprintf(NULL, 0, "%lds/%ldhr\n\%dd %dh %dm %ds", uptime,
+             uptime / 3600, days, hours, minutes, seconds);
     buf = (char *)malloc(sz +
                          1); /* make sure you check for != NULL in real code */
-    snprintf(buf, sz + 1, "%lds/%ldhr\n", uptime, uptime / 3600);
+    snprintf(buf, sz + 1, "%lds/%ldhr\n\%dd %dh %dm %ds", uptime,
+             uptime / 3600, days, hours, minutes, seconds);
 
     return buf;
 }
