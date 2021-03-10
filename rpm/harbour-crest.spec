@@ -9,13 +9,14 @@ Name:       harbour-crest
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Top like application
 Version:    1.7
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    GPL-3.0
 URL:        https://github.com/miska/Crest
 Source0:    %{name}-%{version}.tar.bz2
-Requires:   procps
+Requires:   procps-ng
 Requires:   sailfishsilica-qt5 >= 0.10.9
+Obsoletes:  busybox-symlinks-procps
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Core)
