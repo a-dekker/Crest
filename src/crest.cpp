@@ -40,6 +40,11 @@
 
 QStringList installedApps;
 
+int child_pid = 0;
+void timer_handler(int pid) {
+  kill(child_pid, SIGKILL);
+}
+
 std::vector<proc> ps::get_ps() {
     int pp[2], i, a, b;
     char tmp;
@@ -47,6 +52,7 @@ std::vector<proc> ps::get_ps() {
     std::vector<proc> running;
     proc pr;
     pid_t ch_pid;
+    signal(SIGALRM, timer_handler);
 
     if (pipe(pp) == -1) return running;
     if (!sys_check()) return running;
@@ -58,6 +64,8 @@ std::vector<proc> ps::get_ps() {
                "pid,uid,pcpu,rss,time,%mem,ppid,gid,start_time,args", NULL);
         return running;
     } else {
+        child_pid = ch_pid;
+        alarm(2);
         close(pp[1]);
         waitpid(ch_pid, NULL, 0);
         if (readc(pp[0], tmp) < 1) tmp = 0;
@@ -378,7 +386,7 @@ QVariantList ps::get_ps_by(QString by, QString list_type) {
     return ls;
 }
 
-int ps::kill(int pid, int signal, int userid) {
+int ps::killproc(int pid, int signal, int userid) {
     char buff[64];
     char sudoCmd[14];
     int uid = getuid();

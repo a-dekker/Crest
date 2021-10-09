@@ -33,10 +33,9 @@ ApplicationWindow {
 
     property var is_ok: ps.sys_check()
 
-    allowedOrientations: Orientation.Portrait | Orientation.Landscape
-                         | Orientation.LandscapeInverted
-    _defaultPageOrientations: Orientation.Portrait | Orientation.Landscape
-                              | Orientation.LandscapeInverted
+    allowedOrientations: defaultAllowedOrientations
+    _defaultPageOrientations: defaultAllowedOrientations
+
     cover: Component {
         CoverPage {
         }

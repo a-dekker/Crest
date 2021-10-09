@@ -51,7 +51,7 @@ public:
     Q_INVOKABLE QString uptime();
     Q_INVOKABLE bool sys_check();
     Q_INVOKABLE bool hasSudo();
-    Q_INVOKABLE int kill(int pid, int signal, int userid);
+    Q_INVOKABLE int killproc(int pid, int signal, int userid);
 };
 
 #endif  // SRC_CREST_H_

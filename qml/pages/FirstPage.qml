@@ -324,7 +324,7 @@ Page {
                 function killRemorse(kill_signal) {
                     remorseAction(qsTr(""), function () {
                                 killRemorse(pid)
-                                ps.kill(pid, kill_signal, proc_owner)
+                                ps.killproc(pid, kill_signal, proc_owner)
                                 page.refresh()
                     }, 3000)
                 }
