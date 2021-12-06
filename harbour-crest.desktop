@@ -4,3 +4,6 @@ X-Nemo-Application-Type=silica-qt5
 Name=Crest
 Icon=harbour-crest
 Exec=harbour-crest
+
+[X-Sailjail]
+Sandboxing=Disabled

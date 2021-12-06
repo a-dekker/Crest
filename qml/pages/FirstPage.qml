@@ -90,6 +90,7 @@ Page {
 
     Component.onCompleted: {
         addProc()
+        timer.start()
     }
     onApplicationActiveChanged: {
         if (applicationActive) {

@@ -31,17 +31,12 @@ ApplicationWindow {
         id: ps
     }
 
-    property var is_ok: ps.sys_check()
-
     allowedOrientations: defaultAllowedOrientations
     _defaultPageOrientations: defaultAllowedOrientations
 
     cover: Component {
-        CoverPage {
-        }
+        CoverPage {}
     }
 
-    initialPage: Qt.resolvedUrl(
-                     ps.sys_check(
-                         ) ? "pages/FirstPage.qml" : "pages/ErrorPage.qml")
+    initialPage: Qt.resolvedUrl("pages/FirstPage.qml")
 }

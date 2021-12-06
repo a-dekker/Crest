@@ -21,6 +21,7 @@
 #include "crest.h"
 
 #include <ctype.h>
+#include <dirent.h>
 #include <sailfishapp.h>
 #include <signal.h>
 #include <sys/stat.h>
@@ -33,260 +34,203 @@
 #include <QVariant>
 #include <QtQuick>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <string>
 
 #define readc(a, b) (read(a, &b, 1))
+#define LOC_MAXLEN 5048
 
 QStringList installedApps;
 
-int child_pid = 0;
-void timer_handler(int pid) {
-  kill(child_pid, SIGKILL);
+int check_if_number(char *str) {
+    int i;
+    for (i = 0; str[i] != '\0'; i++) {
+        if (!isdigit(str[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int gettimesinceboot() {
+    long Hertz = sysconf(_SC_CLK_TCK);
+    FILE *procuptime;
+    int sec, ssec;
+
+    procuptime = fopen("/proc/uptime", "r");
+    fscanf(procuptime, "%d.%ds", &sec, &ssec);
+    fclose(procuptime);
+    return (int)((sec * Hertz) + ssec);
 }
 
 std::vector<proc> ps::get_ps() {
-    int pp[2], i, a, b;
-    char tmp;
-    char buff[129];
     std::vector<proc> running;
     proc pr;
-    pid_t ch_pid;
-    signal(SIGALRM, timer_handler);
 
-    if (pipe(pp) == -1) return running;
-    if (!sys_check()) return running;
-    if ((ch_pid = fork()) == 0) {
-        close(1);
-        close(pp[0]);
-        dup2(pp[1], 1);
-        execlp("ps", "ps", "axo",
-               "pid,uid,pcpu,rss,time,%mem,ppid,gid,start_time,args", NULL);
-        return running;
-    } else {
-        child_pid = ch_pid;
-        alarm(2);
-        close(pp[1]);
-        waitpid(ch_pid, NULL, 0);
-        if (readc(pp[0], tmp) < 1) tmp = 0;
-        while (tmp != 0) {
-            pr.cpu = 0;
-            pr.pid = 0;
-            pr.ppid = 0;
-            pr.uid = 0;
-            pr.gid = 0;
-            pr.rss = 0;
-            pr.cputime = "00:00:00";
-            pr.start_time = "";
-            pr.proc_name = "";
-            pr.mem_perc = "0.0";
-            // Space
-            while (!isdigit(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            i = 0;
-            // PID
-            while (isdigit(tmp)) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                sscanf(buff, "%d", &pr.pid);
-            }
-            // Space
-            while (!isdigit(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            i = 0;
-            // UID
-            while (isdigit(tmp) || (tmp == '.')) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                sscanf(buff, "%d", &pr.uid);
-            }
-            // Space
-            while (!isdigit(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            i = 0;
-            // CPU usage
-            while (isdigit(tmp) || (tmp == '.')) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                a = b = 0;
-                sscanf(buff, "%d.%d", &a, &b);
-                pr.cpu = a * 10 + b;
-            }
-            // Space
-            while (!isdigit(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            i = 0;
-            // Memory
-            while (isdigit(tmp)) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                sscanf(buff, "%d", &(pr.rss));
-            }
-            // Space
-            while (isspace(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            // CPU Time
-            i = 0;
-            while (tmp != 0 && i < 9) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                pr.cputime = buff;
-            }
-            // Space
-            while (isspace(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            // Percentage mem
-            i = 0;
-            while (isdigit(tmp) || (tmp == '.')) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                pr.mem_perc = buff;
-            }
-            // Space
-            while (isspace(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            // PPID
-            i = 0;
-            while (isdigit(tmp)) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                sscanf(buff, "%d", &pr.ppid);
-            }
-            // Space
-            while (isspace(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            // GID
-            i = 0;
-            while (isdigit(tmp)) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                sscanf(buff, "%d", &pr.gid);
-            }
-            // Space
-            while (isspace(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            // Start time
-            i = 0;
-            while (!isspace(tmp)) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                pr.start_time = buff;
-            }
-            // Space
-            while (isspace(tmp))
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            // Process name
-            i = 0;
-            while (tmp != '\n' && tmp != 0 && i < 128) {
-                buff[i++] = tmp;
-                if (readc(pp[0], tmp) < 1) {
-                    tmp = 0;
-                    goto save;
-                }
-            }
-            if (i > 0) {
-                buff[i] = 0;
-                pr.proc_name = buff;
-            }
-            // Rest
-            if (i == 128)
-                while (tmp != '\n')
-                    if (readc(pp[0], tmp) < 1) {
-                        tmp = 0;
-                        goto save;
-                    }
-        save:
-            if (pr.proc_name.length() > 1) {
-                running.push_back(pr);
-            }
-        }
-        close(pp[0]);
-        return running;
+    DIR *dirp;
+    FILE *fp;
+    struct dirent *pid_entry;
+    char path[1024], read_buf[1024], read_buf_full[5048];
+    char uid_int_str[6] = {0}, *line;
+    char uptime_str[10];
+    char *user;
+    size_t len = 0;
+    dirp = opendir("/proc/");
+    if (dirp == NULL) {
+        perror("proc error");
+        exit(0);
     }
+    strcpy(path, "/proc/");
+    strcat(path, "uptime");
+
+    fp = fopen(path, "r");
+    if (fp != NULL) {
+        getline(&line, &len, fp);
+        sscanf(line, "%s ", uptime_str);
+        fclose(fp);
+    }
+
+    long uptime = atof(uptime_str);
+    long Hertz = sysconf(_SC_CLK_TCK);
+    strcpy(path, "/proc/");
+    strcat(path, "meminfo");
+
+    fp = fopen(path, "r");
+    unsigned long long total_memory;
+    if (fp != NULL) {
+        getline(&line, &len, fp);
+        sscanf(line, "MemTotal:        %llu kB", &total_memory);
+        fclose(fp);
+    }
+
+    while ((pid_entry = readdir(dirp)) != NULL) {
+        if (check_if_number(pid_entry->d_name)) {
+            // we only handle pid dirs
+            strcpy(path, "/proc/");
+            strcat(path, pid_entry->d_name);
+            strcat(path, "/status");
+            unsigned long long vm_rss;
+            fp = fopen(path, "r");
+            unsigned long long vm_size;
+
+            vm_size = 0;
+            vm_rss = 0;
+            if (fp != NULL) {
+                char myline[1000];
+                while (fgets(myline, sizeof myline, fp) != NULL) {
+                    if ((strstr(myline, "Uid:")) != NULL) {
+                        sscanf(myline, "Uid:    %s ", uid_int_str);
+                    }
+                    if ((strstr(myline, "VmSize:")) != NULL) {
+                        sscanf(myline, "VmSize:    %llu kB", &vm_size);
+                    }
+                    if ((strstr(myline, "VmRSS:")) != NULL) {
+                        sscanf(myline, "VmRSS:\t    %llu kB", &vm_rss);
+                    }
+                }
+                fclose(fp);
+            } else {
+                fprintf(stdout, "FP is NULL, proc has gone?\n");
+                continue;
+            }
+            // int current_user = getuid();
+            float memory_usage = (100.0 * vm_rss) / total_memory;
+            strcpy(path, "/proc/");
+            strcat(path, pid_entry->d_name);
+            strcat(path, "/comm");
+
+            fp = fopen(path, "r");
+            if (fp != NULL) {
+                fscanf(fp, "%s", read_buf);
+                fclose(fp);
+            }
+            strcpy(path, "/proc/");
+            strcat(path, pid_entry->d_name);
+            strcat(path, "/cmdline");
+
+            fp = fopen(path, "r");
+            if (fp != NULL) {
+                int c;
+                strcpy(read_buf_full, "");
+                while ((c = getc(fp)) != EOF) {
+                    // cmdline is \0 separated regarding parameters
+                    if (c == '\0') {
+                        c = ' ';
+                    }
+                    snprintf(read_buf_full + strlen(read_buf_full), LOC_MAXLEN - strlen(read_buf_full), "%c", (char)putchar(c));
+                    printf("\b");  // remove character from stdout
+                }
+                fclose(fp);
+                if (strlen(read_buf_full) == 0) {
+                    strcpy(read_buf_full, "[");
+                    strcat(read_buf_full, read_buf);
+                    strcat(read_buf_full, "]");
+                }
+            }
+            strcpy(path, "/proc/");
+            strcat(path, pid_entry->d_name);
+            strcat(path, "/stat");
+            fp = fopen(path, "r");
+            getline(&line, &len, fp);
+            char state;
+            unsigned int flags;
+            int ppid, pgrp, session, tty_nr, tpgid;
+            unsigned long minflt, cminflt, majflt, cmajflt, utime, stime;
+            unsigned long long starttime;
+            long cutime, cstime, priority, nice, num_threads, itreavalue;
+            int skip =
+                (int)strlen(pid_entry->d_name) + (int)strlen(read_buf) + 4;
+            sscanf(&line[skip],
+                   "%c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld "
+                   "%ld %ld  %ld %llu",
+                   &state, &ppid, &pgrp, &session, &tty_nr, &tpgid, &flags,
+                   &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime,
+                   &cutime, &cstime, &priority, &nice, &num_threads,
+                   &itreavalue, &starttime);
+            unsigned long total_time = utime + stime;
+            total_time =
+                total_time + (unsigned long)cutime + (unsigned long)cstime;
+            float seconds = uptime - (starttime / Hertz);
+            float cpu_usage = 100 * ((total_time / Hertz) / seconds);
+            if (std::isnan(cpu_usage))  // if entry is missing in proc
+            {
+                cpu_usage = 0.0;
+            }
+            if (std::isnan(memory_usage))  // if entry is missing in proc
+            {
+                memory_usage = 0.0;
+            }
+
+            fclose(fp);
+            user = uid_int_str;
+            int sinceboot = gettimesinceboot();
+            int sec_running = (int)(sinceboot - starttime);
+            time_t rt = time(NULL) - (sec_running / Hertz);
+            char start_time[1024];
+
+            strftime(start_time, sizeof(start_time), "%H:%M", localtime(&rt));
+
+            // fprintf(stdout, "%6s %8s %10.1f %7llu %10.1f %6i %6i %7llu %5c
+            // %10s %s\n",
+            //         pid_entry->d_name, user, cpu_usage, vm_rss, memory_usage,
+            //         ppid, tpgid, vm_size, state, start_time, read_buf_full);
+            // printf("Start desect result\n");
+            pr.cpu = cpu_usage;
+            pr.pid = atoi(pid_entry->d_name);
+            pr.ppid = ppid;
+            pr.uid = atoi(user);
+            pr.gid = tpgid;
+            pr.rss = vm_rss;
+            pr.cputime = "00:00:00";
+            pr.start_time = start_time;
+            pr.mem_perc = QString::number(memory_usage, 'g', 2);
+            pr.proc_name = read_buf_full;
+            running.push_back(pr);
+        }
+    }
+    closedir(dirp);
+    return running;
 }
 
 using std::string;
@@ -309,13 +253,6 @@ QString getFileName(const QString &s) {
         return (s_nopath);
     }
     return (s);
-}
-
-bool ps::sys_check() {
-    if (system("test -x \"`which ps`\"") != 0) {
-        return false;
-    }
-    return true;
 }
 
 QVariantList ps::get_ps_by(QString by, QString list_type) {
@@ -360,12 +297,12 @@ QVariantList ps::get_ps_by(QString by, QString list_type) {
             }
         }
         if (i.rss < 999) {
-            snprintf(buff, sizeof(buff), "%d kB", i.rss);
+            snprintf(buff, sizeof(buff), "%d KB", i.rss);
         } else if (i.rss < 2048) {
-            snprintf(buff, sizeof(buff), "%d %3d kB", i.rss / 1000,
+            snprintf(buff, sizeof(buff), "%d.%03d KB", i.rss / 1000,
                      i.rss % 1000);
         } else {
-            int tmp = (i.rss * 100) / 1024;
+            int tmp = (i.rss * 100) / 1000;
             snprintf(buff, sizeof(buff), "%d.%2d MB", tmp / 100, tmp % 100);
         }
         mp.insert("pid", i.pid);
@@ -447,11 +384,11 @@ QString ps::uptime() {
     n %= 60;
     int seconds = n;
     sz = snprintf(NULL, 0, "%lds/%ldhr\n\%dd %dh %dm %ds", uptime,
-             uptime / 3600, days, hours, minutes, seconds);
+                  uptime / 3600, days, hours, minutes, seconds);
     buf = (char *)malloc(sz +
                          1); /* make sure you check for != NULL in real code */
-    snprintf(buf, sz + 1, "%lds/%ldhr\n\%dd %dh %dm %ds", uptime,
-             uptime / 3600, days, hours, minutes, seconds);
+    snprintf(buf, sz + 1, "%lds/%ldhr\n\%dd %dh %dm %ds", uptime, uptime / 3600,
+             days, hours, minutes, seconds);
 
     return buf;
 }

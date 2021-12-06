@@ -49,7 +49,6 @@ public:
     Q_INVOKABLE QVariantList get_ps_by(QString by, QString only_gui);
     Q_INVOKABLE QString load_avg();
     Q_INVOKABLE QString uptime();
-    Q_INVOKABLE bool sys_check();
     Q_INVOKABLE bool hasSudo();
     Q_INVOKABLE int killproc(int pid, int signal, int userid);
 };
