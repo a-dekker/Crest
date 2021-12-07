@@ -159,7 +159,9 @@ std::vector<proc> ps::get_ps() {
                     if (c == '\0') {
                         c = ' ';
                     }
-                    snprintf(read_buf_full + strlen(read_buf_full), LOC_MAXLEN - strlen(read_buf_full), "%c", (char)putchar(c));
+                    snprintf(read_buf_full + strlen(read_buf_full),
+                             LOC_MAXLEN - strlen(read_buf_full), "%c",
+                             (char)putchar(c));
                     printf("\b");  // remove character from stdout
                 }
                 fclose(fp);

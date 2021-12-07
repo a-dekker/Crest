@@ -33,7 +33,7 @@ Page {
     property var list_type: "gui_only"
     property var refreshing: true
     property var paused: false
-    property var applicationActive: app.applicationActive && app.is_ok
+    property var applicationActive: app.applicationActive
     property bool pageactive: false
 
     property string name
@@ -90,7 +90,6 @@ Page {
 
     Component.onCompleted: {
         addProc()
-        timer.start()
     }
     onApplicationActiveChanged: {
         if (applicationActive) {
