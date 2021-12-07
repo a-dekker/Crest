@@ -93,6 +93,7 @@ std::vector<proc> ps::get_ps() {
 
     long uptime = atof(uptime_str);
     long Hertz = sysconf(_SC_CLK_TCK);
+
     strcpy(path, "/proc/");
     strcat(path, "meminfo");
 
@@ -192,7 +193,7 @@ std::vector<proc> ps::get_ps() {
             total_time =
                 total_time + (unsigned long)cutime + (unsigned long)cstime;
             float seconds = uptime - (starttime / Hertz);
-            float cpu_usage = 100 * ((total_time / Hertz) / seconds);
+            float cpu_usage = 1000 * ((total_time / Hertz) / seconds);
             if (std::isnan(cpu_usage))  // if entry is missing in proc
             {
                 cpu_usage = 0.0;

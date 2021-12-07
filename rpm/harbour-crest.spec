@@ -9,7 +9,7 @@ Name:       harbour-crest
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Top like application
 Version:    1.8
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    GPL-3.0
 URL:        https://github.com/miska/Crest
