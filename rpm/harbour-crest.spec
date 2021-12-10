@@ -12,7 +12,7 @@ Version:    1.8
 Release:    3
 Group:      Qt/Qt
 License:    GPL-3.0
-URL:        https://github.com/miska/Crest
+URL:        https://github.com/a-dekker/Crest
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(Qt5Quick)
