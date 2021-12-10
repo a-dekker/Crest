@@ -21,13 +21,13 @@ Current status of application is somewhere around beta. It works and it's not
 gonna eat your kittens (if you are careful), but there might be (and probably
 are) bugs. Especially regarding filtering apps. If you have a good (specific
 and implementable) idea how to improve the application, let me know. Patches
-are also very welcome. Direct both to https://github.com/miska/Crest[github].
+are also very welcome. Direct both to https://github.com/a-dekker/Crest[GitHub].
 
 Binaries
 --------
 
 Binaries are currently available and will be updated at
-https://openrepos.net/content/miska/crest[OpenRepos]
+https://openrepos.net/content/ade/crest-fork[OpenRepos]
 
 About the origin
 ----------------
@@ -35,7 +35,3 @@ About the origin
 This application was written by http://michal.hrusecky.net[Michal Hrušecký] and
 is distributed under GPL-3.0 license with hope that somebody will find it
 useful.
-
-If you like the application, and feel generous, you can
-https://flattr.com/submit/auto?user_id=miska&url=https%3A%2F%2Fgithub.com%2Fmiska%2FCrest[flatter this]
-or send me some bitcoins to BTC: 1JRC4u3dex1ox45RJkijM2aJEMsbZ28wZH
