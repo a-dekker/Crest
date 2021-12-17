@@ -40,6 +40,7 @@ Page {
     property string name_nopath
     property string cpu
     property int proc_owner
+    property string owner_name
     property string pid
     property string ppid
     property string gid
@@ -75,6 +76,7 @@ Page {
             listUnitModel.append({
                                      "cpu": data[i]["cpu"],
                                      "proc_owner": data[i]["proc_owner"],
+                                     "owner_name": data[i]["owner_name"],
                                      "name": data[i]["name"],
                                      "name_nopath": data[i]["name_nopath"],
                                      "pid": data[i]["pid"],
@@ -310,6 +312,7 @@ Page {
                     pageStack.push(Qt.resolvedUrl("ProcInfo.qml"), {
                                        "cpu": cpu,
                                        "proc_owner": proc_owner,
+                                       "owner_name": owner_name,
                                        "name": name,
                                        "pid": pid,
                                        "ppid": ppid,

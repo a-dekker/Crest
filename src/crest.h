@@ -35,6 +35,7 @@ struct proc {
     int rss;
     QString cputime;
     QString proc_name;
+    QString user_name;
     QString start_time;
     QString proc_name_nopath;
     QString mem_perc;

@@ -10,6 +10,7 @@ Page {
     property string cpu: "Unknown"
     property string autoConnect: "Unknown"
     property string proc_owner: "Unknown"
+    property string owner_name: "Unknown"
     property string pid: "Unknown"
     property string gid: "Unknown"
     property string ppid: "Unknown"
@@ -43,14 +44,14 @@ Page {
 
                 Label {
                     width: parent.width * 0.5
-                    text: qsTr("Process name")
+                    text: qsTr("Process")
                     horizontalAlignment: Text.AlignRight
                     color: Theme.primaryColor
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.Wrap
                 }
                 Label {
-                    width: parent.width * 0.5
+                    width: parent.width * 0.5 - Theme.paddingSmall
                     text: name
                     color: Theme.highlightColor
                     font.pixelSize: Theme.fontSizeSmall
@@ -111,7 +112,7 @@ Page {
                 }
                 Label {
                     width: parent.width * 0.5
-                    text: proc_owner
+                    text: owner_name === "" ? proc_owner : proc_owner + " (" + owner_name + ")"
                     color: Theme.highlightColor
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.Wrap
@@ -131,7 +132,7 @@ Page {
                 }
                 Label {
                     width: parent.width * 0.5
-                    text: gid
+                    text: gid !== "-1" ? gid : gid + " (no tty connected)"
                     color: Theme.highlightColor
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.Wrap

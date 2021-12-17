@@ -22,6 +22,7 @@
 
 #include <ctype.h>
 #include <dirent.h>
+#include <pwd.h>
 #include <sailfishapp.h>
 #include <signal.h>
 #include <sys/stat.h>
@@ -35,7 +36,6 @@
 #include <QtQuick>
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <string>
 
 #define readc(a, b) (read(a, &b, 1))
@@ -64,6 +64,14 @@ int gettimesinceboot() {
     return (int)((sec * Hertz) + ssec);
 }
 
+const char *get_username(int uid) {
+    struct passwd *pw = getpwuid(uid);
+    if (pw) {
+        return pw->pw_name;
+    }
+    return "";
+}
+
 std::vector<proc> ps::get_ps() {
     std::vector<proc> running;
     proc pr;
@@ -75,6 +83,7 @@ std::vector<proc> ps::get_ps() {
     char uid_int_str[6] = {0}, *line;
     char uptime_str[10];
     char *user;
+    char username[32];
     size_t len = 0;
     dirp = opendir("/proc/");
     if (dirp == NULL) {
@@ -194,6 +203,12 @@ std::vector<proc> ps::get_ps() {
             unsigned long total_time = utime + stime;
             total_time =
                 total_time + (unsigned long)cutime + (unsigned long)cstime;
+            int hh = (total_time / 100) / 3600;
+            int mi = ((total_time / 100) / 60) % 60;
+            int ss = (total_time / 100) % 60;
+            char total_time_formatted[10];
+            snprintf(total_time_formatted, sizeof(total_time_formatted),
+                     "%d:%02d:%02d", hh, mi, ss);
             float seconds = uptime - (starttime / Hertz);
             float cpu_usage = 1000 * ((total_time / Hertz) / seconds);
             if (std::isnan(cpu_usage))  // if entry is missing in proc
@@ -206,6 +221,8 @@ std::vector<proc> ps::get_ps() {
             }
 
             fclose(fp);
+            snprintf(username, sizeof(username), "%s",
+                     get_username(atoi(uid_int_str)));
             user = uid_int_str;
             int sinceboot = gettimesinceboot();
             int sec_running = (int)(sinceboot - starttime);
@@ -223,9 +240,10 @@ std::vector<proc> ps::get_ps() {
             pr.pid = atoi(pid_entry->d_name);
             pr.ppid = ppid;
             pr.uid = atoi(user);
+            pr.user_name = username;
             pr.gid = tpgid;
             pr.rss = vm_rss;
-            pr.cputime = "00:00:00";
+            pr.cputime = total_time_formatted;
             pr.start_time = start_time;
             pr.mem_perc = QString::number(memory_usage, 'g', 2);
             pr.proc_name = read_buf_full;
@@ -311,6 +329,7 @@ QVariantList ps::get_ps_by(QString by, QString list_type) {
         mp.insert("pid", i.pid);
         mp.insert("ppid", i.ppid);
         mp.insert("proc_owner", i.uid);
+        mp.insert("owner_name", i.user_name);
         mp.insert("gid", i.gid);
         mp.insert("rss", QString(buff));
         snprintf(buff, sizeof(buff), "%d.%d %%", i.cpu / 10, i.cpu % 10);
