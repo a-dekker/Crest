@@ -44,7 +44,7 @@ Page {
 
                 Label {
                     width: parent.width * 0.5
-                    text: qsTr("Process")
+                    text: qsTr("Command")
                     horizontalAlignment: Text.AlignRight
                     color: Theme.primaryColor
                     font.pixelSize: Theme.fontSizeSmall

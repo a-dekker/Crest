@@ -150,8 +150,7 @@ Page {
                     page.refresh()
                 }
             }
-            SearchMenuItem {
-            }
+            SearchMenuItem {}
             MenuItem {
                 id: sortColumn
                 text: qsTr("Sort by RSS")
@@ -231,8 +230,7 @@ Page {
             }
             clip: true
 
-            VerticalScrollDecorator {
-            }
+            VerticalScrollDecorator {}
 
             header: Item {
                 id: header
@@ -326,9 +324,8 @@ Page {
 
                 function killRemorse(kill_signal) {
                     remorseAction(qsTr(""), function () {
-                                killRemorse(pid)
-                                ps.killproc(pid, kill_signal, proc_owner)
-                                page.refresh()
+                        ps.killproc(pid, kill_signal, proc_owner)
+                        page.refresh()
                     }, 3000)
                 }
 
@@ -336,7 +333,7 @@ Page {
                     id: contextMenu
                     ContextMenu {
                         Component.onCompleted: page.pause()
-                        Component.onDestruction: page.unpause()
+                        onClosed: page.unpause()
                         MenuItem {
                             text: qsTr("Terminate pid ") + pid
                             onClicked: {
