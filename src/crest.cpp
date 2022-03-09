@@ -324,7 +324,7 @@ QVariantList ps::get_ps_by(QString by, QString list_type) {
                      i.rss % 1000);
         } else {
             int tmp = (i.rss * 100) / 1000;
-            snprintf(buff, sizeof(buff), "%d.%2d MB", tmp / 100, tmp % 100);
+            snprintf(buff, sizeof(buff), "%d.%02d MB", tmp / 100, tmp % 100);
         }
         mp.insert("pid", i.pid);
         mp.insert("ppid", i.ppid);
