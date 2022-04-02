@@ -11,7 +11,7 @@ Summary:    Top like application
 Version:    1.9
 Release:    3
 Group:      Qt/Qt
-License:    GPL-3.0
+License:    GPLv3
 URL:        https://github.com/a-dekker/Crest
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
@@ -22,7 +22,7 @@ BuildRequires:  pkgconfig(sailfishapp) >= 0.0.10
 BuildRequires:  desktop-file-utils
 
 %description
-Simple top like application. Show applications/processes on your cell phone sorted either by CPU or memory usage. Let's you kill processes running under the same user. Use with care. Cover page shows average load.
+Simple top/ps like app. Use with care then terminating stuff.
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -56,8 +56,7 @@ desktop-file-install --delete-original       \
 
 %files
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}
-%{_datadir}/%{name}
+%attr(755,root,root) %{_bindir}/%{name}
 %{_datadir}/%{name}/qml
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
