@@ -8,8 +8,8 @@ Name:       harbour-crest
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Top like application
-Version:    1.9
-Release:    3
+Version:    1.10
+Release:    1
 Group:      Qt/Qt
 License:    GPLv3
 URL:        https://github.com/a-dekker/Crest

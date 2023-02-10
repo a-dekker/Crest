@@ -418,22 +418,31 @@ QString ps::uptime() {
 QStringList getAppList() {
     QStringList listOfApps;
     QString baseName;
-    QDirIterator it("/usr/share/applications", QStringList() << "*.desktop",
-                    QDir::Files);
-    while (it.hasNext()) {
-        it.next();
-        baseName = it.fileName();
-        if (baseName.startsWith(
-                "apkd_launcher")) {  // android name needs cleanup
-            baseName = baseName.replace("apkd_launcher_", "");
-            const int n = baseName.indexOf('-');
-            baseName = baseName.remove(n, baseName.length() - n);
-            baseName = baseName.replace("_", ".");
-        } else {  // sailfish just has .desktop at the end
-            baseName = baseName.replace(".desktop", "");
+    QStringList dirs;
+    QString homedir;
+
+    if ((homedir = getenv("HOME")) == NULL) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+    dirs << "/usr/share/applications" << homedir + "/.local/share/applications";
+
+    foreach (QString directory, dirs) {
+        QDirIterator it(directory, QStringList() << "*.desktop", QDir::Files);
+        while (it.hasNext()) {
+            it.next();
+            baseName = it.fileName();
+            if (baseName.startsWith(
+                    "apkd_launcher")) {  // android name needs cleanup
+                baseName = baseName.replace("apkd_launcher_", "");
+                const int n = baseName.indexOf('-');
+                baseName = baseName.remove(n, baseName.length() - n);
+                baseName = baseName.replace("_", ".");
+            } else {  // sailfish just has .desktop at the end
+                baseName = baseName.replace(".desktop", "");
+            }
+            listOfApps << "sailfish-qml";
+            listOfApps << baseName;
         }
-        listOfApps << "sailfish-qml";
-        listOfApps << baseName;
     }
     return listOfApps;
 }
