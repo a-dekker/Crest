@@ -110,7 +110,7 @@ Page {
 
     Timer {
         id: timer
-        interval: 3000
+        interval: 6000
         running: page.refreshing && page.pageactive
         repeat: true
         onTriggered: page.refresh()

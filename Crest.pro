@@ -15,7 +15,9 @@ OTHER_FILES += \
     qml/pages/CoverPage.qml \
     qml/common/SearchMenuItem.qml \
     qml/common/SearchPanel.qml \
-    qml/common/PageHeaderExtended.qml
+    qml/common/PageHeaderExtended.qml \
+    qml/icons/ram.png \
+    qml/icons/swap.png
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 

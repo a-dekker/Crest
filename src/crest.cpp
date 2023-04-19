@@ -415,6 +415,49 @@ QString ps::uptime() {
     return buf;
 }
 
+QVariantMap ps::memory_values() {
+    QVariantMap memInfo;
+    FILE *fl = NULL;
+    fl = fopen("/proc/meminfo", "r");
+    if (fl == NULL) qDebug() << "Error reading /proc/meminfo";
+    char mem_line[256];
+    memInfo["MemAvail"] = 0;
+    while (fgets(mem_line, sizeof(mem_line), fl)) {
+        int memval;
+        if (sscanf(mem_line, "MemTotal: %d kB", &memval) == 1) {
+            memInfo["MemTotal"] = memval / 1024 / (float)1024;
+        }
+        if (sscanf(mem_line, "SwapTotal: %d kB", &memval) == 1) {
+            memInfo["SwapTotal"] = memval / 1024;
+        }
+        if (sscanf(mem_line, "SwapFree: %d kB", &memval) == 1) {
+            memInfo["SwapFree"] = memval / 1024;
+        }
+        if (sscanf(mem_line, "MemFree: %d kB", &memval) == 1) {
+            memInfo["MemFree"] = memval / 1024;
+        }
+        if (sscanf(mem_line, "Buffers: %d kB", &memval) == 1) {
+            memInfo["Buffers"] = memval / 1024;
+        }
+        if (sscanf(mem_line, "Cached: %d kB", &memval) == 1) {
+            memInfo["Cached"] = memval / 1024;
+        }
+        if (sscanf(mem_line, "MemAvailable: %d kB", &memval) == 1) {
+            memInfo["MemAvail"] = memval / 1024 / (float)1024;
+        }
+    }
+    if (memInfo["MemAvail"] == 0) {
+        // MemAvail not available on older kernels (jolla tablet/jolla phone)
+        // available =  MemFree + Buffers + Cached
+        memInfo["MemAvail"] =
+            (memInfo["MemFree"].toInt() + memInfo["Buffers"].toInt() +
+             memInfo["Cached"].toInt()) /
+            (float)1024;
+    }
+    fclose(fl);
+    return memInfo;
+}
+
 QStringList getAppList() {
     QStringList listOfApps;
     QString baseName;
