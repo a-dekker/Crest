@@ -19,6 +19,7 @@
 import Sailfish.Silica 1.0
 
 MenuItem {
+    visible: !searchPanel.open
     enabled: list.count || searchPanel.searchText
     text: qsTranslate("Crest", "Search")
 
