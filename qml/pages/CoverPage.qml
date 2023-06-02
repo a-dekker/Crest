@@ -108,7 +108,8 @@ CoverBackground {
                 color: Theme.highlightColor
             }
             Label {
-                text: (memTotal - memAvail).toFixed(2) + "G/" + Math.round(memTotal * 100) /100 + "G"
+                text: (memTotal - memAvail).toFixed(2) + "G/" + Math.round(
+                          memTotal * 100) / 100 + "G"
                 color: Theme.highlightColor
                 width: (parent.width - (Theme.paddingMedium * 2)) * .25
                 horizontalAlignment: Text.AlignRight
@@ -145,7 +146,8 @@ CoverBackground {
             width: parent.width
             Label {
                 width: (parent.width - (Theme.paddingMedium * 2)) * .75
-                text: swapTotal === "0" ? qsTr("No swap") : Math.round(swapUsage / swapTotal * 100) + "%"
+                text: swapTotal === "0" ? qsTr("No swap") : Math.round(
+                                              swapUsage / swapTotal * 100) + "%"
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.highlightColor
             }

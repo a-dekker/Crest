@@ -26,16 +26,15 @@ import "../common"
 Page {
     id: page
 
-    property var cpu_size: Theme.fontSizeSmall * 3.4
-    property var rss_size: Theme.fontSizeSmall * 4.4
-    property var name_size: page.width - cpu_size - rss_size
-    property var sort: "cpu"
-    property var list_type: "gui_only"
-    property var refreshing: true
-    property var paused: false
+    property int cpu_size: Theme.fontSizeSmall * 3.4
+    property int rss_size: Theme.fontSizeSmall * 4.4
+    property int name_size: page.width - cpu_size - rss_size
+    property string sort: "cpu"
+    property string list_type: "gui_only"
+    property bool refreshing: true
+    property bool paused: false
     property var applicationActive: app.applicationActive
     property bool pageactive: false
-
     property string name
     property string name_nopath
     property string cpu
@@ -125,11 +124,10 @@ Page {
                 text: qsTr("Autorefresh off")
                 onClicked: {
                     page.refreshing = !page.refreshing
-                    if (!page.refreshing) {
+                    if (!page.refreshing)
                         refreshMenu.text = qsTr("Autorefresh on")
-                    } else {
+                    else
                         refreshMenu.text = qsTr("Autorefresh off")
-                    }
                     page.refresh()
                 }
             }
@@ -223,32 +221,25 @@ Page {
 
         SilicaListView {
             id: list
+
+            property Item contextMenu
+
+            clip: true
+            x: Theme.paddingSmall
+            y: Theme.paddingMedium
+            width: parent.width - 2 * x
+            height: parent.height - y
+            model: listUnitProxyModel
+            onMovementStarted: page.pause()
+            onMovementEnded: page.unpause()
+
             anchors {
                 fill: parent
                 bottomMargin: 0
                 topMargin: searchPanel.visibleSize
             }
-            clip: true
 
             VerticalScrollDecorator {}
-
-            header: Item {
-                id: header
-                // This is just a placeholder for the header box. To avoid the
-                // list view resetting the input box everytime the model resets,
-                // the search entry is defined outside the list view.
-                width: pageHeader.width
-                height: pageHeader.height
-                Component.onCompleted: pageHeader.parent = header
-            }
-            x: Theme.paddingSmall
-            y: Theme.paddingMedium
-            width: parent.width - 2 * x
-            height: parent.height - y
-            property Item contextMenu
-            model: listUnitProxyModel
-            onMovementStarted: page.pause()
-            onMovementEnded: page.unpause()
 
             ListModel {
                 id: listUnitModel
@@ -267,6 +258,17 @@ Page {
                     sortOrder: sort === "-name" ? Qt.DescendingOrder : Qt.AscendingOrder
                     roleName: isPortrait ? "name_nopath" : "name"
                 }
+            }
+
+            header: Item {
+                id: header
+
+                // This is just a placeholder for the header box. To avoid the
+                // list view resetting the input box everytime the model resets,
+                // the search entry is defined outside the list view.
+                width: pageHeader.width
+                height: pageHeader.height
+                Component.onCompleted: pageHeader.parent = header
             }
 
             delegate: ListItem {

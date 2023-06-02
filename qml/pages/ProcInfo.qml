@@ -25,8 +25,7 @@ Page {
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
 
-        VerticalScrollDecorator {
-        }
+        VerticalScrollDecorator {}
 
         Column {
             id: column
