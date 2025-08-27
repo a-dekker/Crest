@@ -21,6 +21,7 @@
  ******************************************************************************/
 import QtQuick 2.2
 import Sailfish.Silica 1.0
+import Nemo.Configuration 1.0
 import "pages"
 import harbour.crest.ps 1.0
 
@@ -29,6 +30,16 @@ ApplicationWindow {
 
     PS {
         id: ps
+    }
+
+    ConfigurationGroup {
+        id: config
+
+        path: "/apps/harbour-crest"
+
+        property bool autorefresh: true
+        property string processlist: "gui_only"
+        property string sortorder: "cpu"
     }
 
     allowedOrientations: defaultAllowedOrientations

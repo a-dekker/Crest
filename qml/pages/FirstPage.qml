@@ -29,9 +29,9 @@ Page {
     property int cpu_size: Theme.fontSizeSmall * 3.4
     property int rss_size: Theme.fontSizeSmall * 4.4
     property int name_size: page.width - cpu_size - rss_size
-    property string sort: "cpu"
-    property string list_type: "gui_only"
-    property bool refreshing: true
+    property string sort: config.sortorder
+    property string list_type: config.processlist
+    property bool refreshing: config.autorefresh
     property bool paused: false
     property var applicationActive: app.applicationActive
     property bool pageactive: false
@@ -120,8 +120,16 @@ Page {
 
         PullDownMenu {
             MenuItem {
+                text: qsTr("Settings")
+                onClicked: {
+                    pageactive = false
+                    pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+                }
+            }
+            MenuItem {
                 id: refreshMenu
-                text: qsTr("Autorefresh off")
+                text: config.autorefresh ? qsTr("Autorefresh off") : qsTr(
+                                               "Autorefresh on")
                 onClicked: {
                     page.refreshing = !page.refreshing
                     if (!page.refreshing)
@@ -133,7 +141,7 @@ Page {
             }
             MenuItem {
                 id: guiMenu
-                text: qsTr("Show all processes")
+                text: config.processlist === "gui_only" ? "Show all processes" : config.processlist === "all_procs" ? "Incl. no cmdline [top 60]" : "Show only apps"
                 onClicked: {
                     if (page.list_type === "gui_only") {
                         page.list_type = "all_procs"
@@ -151,7 +159,9 @@ Page {
             SearchMenuItem {}
             MenuItem {
                 id: sortColumn
-                text: qsTr("Sort by RSS")
+                text: config.sortorder === "cpu" ? qsTr("Sort by RSS") : config.sortorder
+                                                   === "rss" ? qsTr("Sort by name") : qsTr(
+                                                                   "Sort by CPU")
                 onClicked: {
                     if (page.sort === "cpu") {
                         page.sort = "rss"
