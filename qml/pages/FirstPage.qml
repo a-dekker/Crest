@@ -33,7 +33,6 @@ Page {
     property string list_type: config.processlist
     property bool refreshing: config.autorefresh
     property bool paused: false
-    property var applicationActive: app.applicationActive
     property bool pageactive: false
     property string name
     property string name_nopath
@@ -92,11 +91,14 @@ Page {
     Component.onCompleted: {
         addProc()
     }
-    onApplicationActiveChanged: {
-        if (applicationActive) {
-            refresh()
-        } else {
-            pause()
+    Connections {
+        target: Qt.application
+        onStateChanged: {
+            if (Qt.application.state === Qt.ApplicationActive) {
+                refresh()
+            } else {
+                pause()
+            }
         }
     }
 
