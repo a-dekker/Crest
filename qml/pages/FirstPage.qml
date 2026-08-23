@@ -143,7 +143,7 @@ Page {
             }
             MenuItem {
                 id: guiMenu
-                text: config.processlist === "gui_only" ? "Show all processes" : config.processlist === "all_procs" ? "Incl. no cmdline [top 60]" : "Show only apps"
+                text: config.processlist === "gui_only" ? qsTr("Show all processes") : config.processlist === "all_procs" ? qsTr("Incl. no cmdline [top 60]") : qsTr("Show only apps")
                 onClicked: {
                     if (page.list_type === "gui_only") {
                         page.list_type = "all_procs"
@@ -196,7 +196,7 @@ Page {
             PageHeaderExtended {
                 id: pageHeader
                 anchors.top: parent.top
-                anchors.topMargin: Theme.paddingSmall
+                anchors.topMargin: Screen.hasCutouts && isPortrait ? Theme.paddingLarge * 2 : Theme.paddingSmall
                 anchors.left: parent.left
                 Row {
                     Label {

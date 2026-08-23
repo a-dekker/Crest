@@ -131,7 +131,7 @@ Page {
                 }
                 Label {
                     width: parent.width * 0.5
-                    text: gid !== "-1" ? gid : gid + " (no tty connected)"
+                    text: gid !== "-1" ? gid : gid + qsTr(" (no tty connected)")
                     color: Theme.highlightColor
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.Wrap
