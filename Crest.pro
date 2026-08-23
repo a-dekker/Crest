@@ -2,6 +2,7 @@ TARGET = harbour-crest
 
 CONFIG += sailfishapp
 CONFIG += c++11
+CONFIG += sailfishapp_i18n
 
 SOURCES += src/crest.cpp
 
@@ -9,6 +10,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 
 OTHER_FILES += \
     rpm/harbour-crest.spec \
+    translations/*.ts \
     harbour-crest.desktop \
     qml/harbour-crest.qml \
     qml/pages/FirstPage.qml \
@@ -20,7 +22,20 @@ OTHER_FILES += \
     qml/icons/ram.png \
     qml/icons/swap.png
 
+DEPLOYMENT_PATH = /usr/share/$${TARGET}
+INSTALLS += translations
+TRANSLATIONS = translations/harbour-crest-nl.ts \
+               translations/harbour-crest-nl_BE.ts
+translations.files = translations
+translations.path = $${DEPLOYMENT_PATH}
+# only include these files for translation:
+lupdate_only {
+    SOURCES = qml/*.qml \
+              qml/pages/*.qml \
+}
+
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
+
 
 HEADERS += \
     src/crest.h
