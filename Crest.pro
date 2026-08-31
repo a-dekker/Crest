@@ -25,7 +25,8 @@ OTHER_FILES += \
 DEPLOYMENT_PATH = /usr/share/$${TARGET}
 INSTALLS += translations
 TRANSLATIONS = translations/harbour-crest-nl.ts \
-               translations/harbour-crest-nl_BE.ts
+               translations/harbour-crest-nl_BE.ts \
+               translations/harbour-crest-sv.ts
 translations.files = translations
 translations.path = $${DEPLOYMENT_PATH}
 # only include these files for translation:
