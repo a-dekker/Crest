@@ -147,7 +147,7 @@ Page {
                 onClicked: {
                     if (page.list_type === "gui_only") {
                         page.list_type = "all_procs"
-                        guiMenu.text = "Incl. no cmdline [top 60]"
+                        guiMenu.text = qsTr("Incl. no cmdline [top 60]")
                     } else if (page.list_type === "all_procs") {
                         page.list_type = "incl_nocmd"
                         guiMenu.text = qsTr("Show only apps")
